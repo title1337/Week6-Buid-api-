@@ -29,6 +29,35 @@ app.get('/events', async (req, res) => {
   });
 });
 
+app.get('/events/:eventId', validateEventId, async (req, res) => {
+  try {
+    const result = await connectionPool.query(
+      `
+        SELECT *
+        FROM events
+        WHERE event_id = $1
+      `,
+      [req.eventId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'event not found',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Get event successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('[GET /events/:eventId] database error:', error.message);
+
+    return res.status(500).json({
+      message: 'Server could not get product',
+    });
+  }
+});
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
