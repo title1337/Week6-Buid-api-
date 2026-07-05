@@ -15,7 +15,7 @@ app.get('/health', (req, res) => {
 });
 
 // TODO: อ่าน API Document แล้วสร้าง routes เองในไฟล์นี้
-app.get('/events', async (req, res) => {
+app.get('/events', [validateEventId], async (req, res) => {
   let results;
   try {
     results = await connectionPool.query('select * from events');
@@ -29,37 +29,40 @@ app.get('/events', async (req, res) => {
   });
 });
 
-app.get('/events/:eventId', [validateEventBody], async (req, res) => {
-  let page = 1;
-  let limit = 5;
-  const offset = (page - 1) * limit;
+app.get('/events/:eventId', async (req, res) => {
   try {
+    const eventId = req.params.eventId;
+
+    if (!Number.isInteger(Number(eventId)) || Number(eventId) <= 0) {
+      return res.status(400).json({
+        message: 'Invalid event id',
+      });
+    }
+
     const result = await connectionPool.query(
       `
-      SELECT *
-      FROM events
-      ORDER BY event_id ASC
-      lIMIT $1
-      OFFSET $2
-    `,
-      [limit, offset],
+        SELECT *
+        FROM events
+        WHERE event_id = $1
+      `,
+      [eventId],
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
-        message: 'event not found',
+        message: 'Event not found',
       });
     }
 
     return res.status(200).json({
-      message: 'Get event successfully',
+      message: 'Get Event successfully',
       data: result.rows[0],
     });
   } catch (error) {
     console.error('[GET /events/:eventId] database error:', error.message);
 
     return res.status(500).json({
-      message: 'Server could not get product',
+      message: 'Server could not get Event',
     });
   }
 });
