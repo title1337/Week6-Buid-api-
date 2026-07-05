@@ -177,6 +177,78 @@ app.put(
   },
 );
 
+app.delete('/events/:eventId', validateEventId, async (req, res) => {
+  try {
+    const result = await connectionPool.query(
+      `
+        DELETE FROM events
+        WHERE event_id = $1
+        RETURNING *
+      `,
+      [req.eventId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'event not found',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Deleted event successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('[DELETE /events/:eventId] database error:', error.message);
+
+    return res.status(500).json({
+      message: 'Server could not delete event',
+    });
+  }
+});
+
+app.get('/events/:eventId/registrations', validateEventId, async (req, res) => {
+  try {
+    const eventResult = await connectionPool.query(
+      `
+        SELECT event_id
+        FROM events
+        WHERE event_id = $1
+      `,
+      [req.eventId],
+    );
+
+    if (eventResult.rows.length === 0) {
+      return res.status(404).json({
+        message: 'event not found',
+      });
+    }
+
+    const registrationsResult = await connectionPool.query(
+      `
+        SELECT registration_id, attendee_name, attendee_email, created_at
+        FROM event_registrations
+        WHERE event_id = $1
+        ORDER BY registration_id
+      `,
+      [req.eventId],
+    );
+
+    return res.status(200).json({
+      message: 'Get registrations successfully',
+      data: registrationsResult.rows,
+    });
+  } catch (error) {
+    console.error(
+      '[GET /events/:eventId/registrations] database error:',
+      error.message,
+    );
+
+    return res.status(500).json({
+      message: 'Server could not get registrations',
+    });
+  }
+});
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
