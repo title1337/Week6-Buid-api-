@@ -122,6 +122,60 @@ app.post('/events', validateEventBody, async (req, res) => {
     });
   }
 });
+
+app.put(
+  '/events/:eventId',
+  validateEventId,
+  validateEventBody,
+  async (req, res) => {
+    const { title, description, location, event_date, capacity, status } =
+      req.body;
+
+    try {
+      const result = await connectionPool.query(
+        `
+        UPDATE events
+        SET
+          title = $1,
+          description = $2,
+          location = $3,
+          event_date = $4,
+          capacity = $5,
+          status = $6,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE event_id = $7
+        RETURNING *
+      `,
+        [
+          title,
+          description,
+          location,
+          event_date,
+          capacity,
+          status,
+          req.eventId,
+        ],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: 'event not found',
+        });
+      }
+
+      return res.status(200).json({
+        message: 'Updated event successfully',
+        data: result.rows[0],
+      });
+    } catch (error) {
+      console.error('[PUT /events/:eventId] database error:', error.message);
+
+      return res.status(500).json({
+        message: 'Server could not update event',
+      });
+    }
+  },
+);
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
