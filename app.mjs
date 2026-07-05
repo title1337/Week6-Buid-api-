@@ -95,6 +95,33 @@ app.get('/events/:eventId', validateEventId, async (req, res) => {
     });
   }
 });
+
+app.post('/events', validateEventBody, async (req, res) => {
+  const { title, description, location, event_date, capacity, status } =
+    req.body;
+
+  try {
+    const result = await connectionPool.query(
+      `
+        INSERT INTO events (title, description, location, event_date, capacity, status)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+      `,
+      [title, description, location, event_date, capacity, status],
+    );
+
+    return res.status(201).json({
+      message: 'Created event successfully',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error('[POST /events] database error:', error.message);
+
+    return res.status(500).json({
+      message: 'Server could not create event',
+    });
+  }
+});
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
