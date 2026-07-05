@@ -66,40 +66,32 @@ app.get('/events', validateEventsQuery, async (req, res) => {
   }
 });
 
-app.get('/events/:eventId', async (req, res) => {
+app.get('/events/:eventId', validateEventId, async (req, res) => {
   try {
-    const eventId = req.params.eventId;
-
-    if (!Number.isInteger(Number(eventId)) || Number(eventId) <= 0) {
-      return res.status(400).json({
-        message: 'Invalid event id',
-      });
-    }
-
     const result = await connectionPool.query(
       `
         SELECT *
         FROM events
         WHERE event_id = $1
       `,
-      [eventId],
+      [req.eventId],
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
-        message: 'Event not found',
+        message: 'event not found',
       });
     }
 
     return res.status(200).json({
-      message: 'Get Event successfully',
+      message: 'Get event successfully',
       data: result.rows[0],
     });
   } catch (error) {
     console.error('[GET /events/:eventId] database error:', error.message);
 
     return res.status(500).json({
-      message: 'Server could not get Event',
+      message: 'Server could not get event',
     });
   }
 });
