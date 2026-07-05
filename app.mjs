@@ -176,6 +176,7 @@ app.put(
     }
   },
 );
+
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
