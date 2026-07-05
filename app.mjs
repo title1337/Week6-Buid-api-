@@ -2,6 +2,7 @@ import express from 'express';
 import connectionPool from './utils/db.mjs';
 import { validateEventId } from './middlewares/validateEventId.mjs';
 import { validateEventBody } from './middlewares/validateEventBody.mjs';
+import { validateEventsQuery } from './middlewares/validateEventsQuery.mjs';
 
 const app = express();
 const port = 5006;
@@ -15,18 +16,54 @@ app.get('/health', (req, res) => {
 });
 
 // TODO: อ่าน API Document แล้วสร้าง routes เองในไฟล์นี้
-app.get('/events', [validateEventId], async (req, res) => {
-  let results;
+app.get('/events', validateEventsQuery, async (req, res) => {
+  const { page, limit, status } = req.eventsQuery;
+  const offset = (page - 1) * limit;
+
   try {
-    results = await connectionPool.query('select * from events');
-  } catch {
+    const whereClause = status ? 'WHERE status = $1' : '';
+    const dataValues = status ? [status, limit, offset] : [limit, offset];
+    const countValues = status ? [status] : [];
+
+    const dataQuery = `
+      SELECT event_id, title
+      FROM events
+      ${whereClause}
+      ORDER BY event_id
+      LIMIT $${status ? 2 : 1}
+      OFFSET $${status ? 3 : 2}
+    `;
+
+    const countQuery = `
+      SELECT COUNT(*) AS total_items
+      FROM events
+      ${whereClause}
+    `;
+
+    const dataResult = await connectionPool.query(dataQuery, dataValues);
+    const countResult = await connectionPool.query(countQuery, countValues);
+
+    const totalItems = Number(countResult.rows[0].total_items);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(200).json({
+      message: 'Get events successfully',
+      data: dataResult.rows,
+      pagination: {
+        page,
+        limit,
+        currentItems: dataResult.rows.length,
+        totalItems,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    console.error('[GET /events] database error:', error.message);
+
     return res.status(500).json({
-      message: 'Server could not read assignment because database issue',
+      message: 'Server could not get events',
     });
   }
-  return res.status(200).json({
-    data: results.rows,
-  });
 });
 
 app.get('/events/:eventId', async (req, res) => {
