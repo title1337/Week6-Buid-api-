@@ -15,7 +15,8 @@ app.get('/health', (req, res) => {
 });
 
 // TODO: อ่าน API Document แล้วสร้าง routes เองในไฟล์นี้
-app.get('/events', [validateEventBody], async (req, res) => {
+app.get('/events', async (req, res) => {
+  let results;
   try {
     results = await connectionPool.query('select * from events');
   } catch {
@@ -27,6 +28,7 @@ app.get('/events', [validateEventBody], async (req, res) => {
     data: results.rows,
   });
 });
+
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
