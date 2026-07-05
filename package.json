@@ -1,0 +1,15 @@
+{
+  "name": "event-booking-api-practical-exam",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon app.mjs",
+    "start": "nodemon app.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4",
+    "pg": "^8.12.0"
+  }
+}

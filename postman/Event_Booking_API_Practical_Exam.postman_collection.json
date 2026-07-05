@@ -1,0 +1,216 @@
+{
+  "info": {
+    "name": "Event Booking API Practical Exam",
+    "_postman_id": "e90fa537-f479-451b-9b96-9de0d2d38410",
+    "description": "Postman collection for the BE6 Sunday practical exam.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5006"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "01 Get Events - default pagination",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "02 Get Events - page 1 limit 5",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?page=1&limit=5"
+      }
+    },
+    {
+      "name": "03 Get Events - page 2 limit 5",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?page=2&limit=5"
+      }
+    },
+    {
+      "name": "04 Get Events - filter published",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?status=published&page=1&limit=5"
+      }
+    },
+    {
+      "name": "05 Invalid Events Query - page text",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?page=abc&limit=5"
+      }
+    },
+    {
+      "name": "06 Invalid Events Query - limit too high",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?page=1&limit=20"
+      }
+    },
+    {
+      "name": "07 Invalid Events Query - status wrong",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events?status=archived&page=1&limit=5"
+      }
+    },
+    {
+      "name": "08 Get Event By ID - success",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/1"
+      }
+    },
+    {
+      "name": "09 Get Event By ID - invalid id",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/abc"
+      }
+    },
+    {
+      "name": "10 Get Event By ID - not found",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/999999"
+      }
+    },
+    {
+      "name": "11 Create Event - success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Backend Career Meetup\",\n  \"description\": \"Meetup for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-09-10\",\n  \"capacity\": 50,\n  \"status\": \"draft\"\n}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "12 Create Event - missing title",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Meetup for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-09-10\",\n  \"capacity\": 50,\n  \"status\": \"draft\"\n}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "13 Create Event - invalid capacity",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Backend Career Meetup\",\n  \"description\": \"Meetup for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-09-10\",\n  \"capacity\": 0,\n  \"status\": \"draft\"\n}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "14 Create Event - invalid status",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Backend Career Meetup\",\n  \"description\": \"Meetup for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-09-10\",\n  \"capacity\": 50,\n  \"status\": \"archived\"\n}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "15 Update Event - success",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Node API Career Night Updated\",\n  \"description\": \"Updated talk and live coding for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-07-12\",\n  \"capacity\": 90,\n  \"status\": \"published\"\n}"
+        },
+        "url": "{{baseUrl}}/events/1"
+      }
+    },
+    {
+      "name": "16 Update Event - not found",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Node API Career Night Updated\",\n  \"description\": \"Updated talk and live coding for junior backend developers\",\n  \"location\": \"Bangkok\",\n  \"event_date\": \"2026-07-12\",\n  \"capacity\": 90,\n  \"status\": \"published\"\n}"
+        },
+        "url": "{{baseUrl}}/events/999999"
+      }
+    },
+    {
+      "name": "17 Delete Event - success",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/events/15"
+      }
+    },
+    {
+      "name": "18 Delete Event - not found",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/events/999999"
+      }
+    },
+    {
+      "name": "19 Bonus - Get Event Registrations",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events/1/registrations"
+      }
+    }
+  ]
+}
