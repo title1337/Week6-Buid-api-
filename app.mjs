@@ -29,15 +29,20 @@ app.get('/events', async (req, res) => {
   });
 });
 
-app.get('/events/:eventId', validateEventId, async (req, res) => {
+app.get('/events/:eventId', [validateEventBody], async (req, res) => {
+  let page = 1;
+  let limit = 5;
+  const offset = (page - 1) * limit;
   try {
     const result = await connectionPool.query(
       `
-        SELECT *
-        FROM events
-        WHERE event_id = $1
-      `,
-      [req.eventId],
+      SELECT *
+      FROM events
+      ORDER BY event_id ASC
+      lIMIT $1
+      OFFSET $2
+    `,
+      [limit, offset],
     );
 
     if (result.rows.length === 0) {
