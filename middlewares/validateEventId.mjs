@@ -15,14 +15,6 @@ export function validateEventId(req, res, next) {
     });
   }
 
-  const allowedStatus = ['draft', 'published', 'cancelled'];
-
-  if (status && !allowedStatus.includes(status)) {
-    return res.status(400).json({
-      message: 'status must be draft, published or cancelled',
-    });
-  }
-
   req.validateEventId = {
     page: paresdPage,
     limit: parsedLimit,
