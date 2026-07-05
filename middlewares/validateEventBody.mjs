@@ -27,7 +27,7 @@ export function validateEventBody(req, res, next) {
     });
   }
 
-  if (!event.capacity) {
+  if (event.capacity === undefined) {
     return res.status(400).json({
       message: 'กรุณาส่งข้อมูล capacity เข้ามาด้วย',
     });
