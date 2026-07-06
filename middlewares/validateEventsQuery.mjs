@@ -1,4 +1,5 @@
 const allowedStatuses = ['draft', 'published', 'cancelled'];
+// [Comment] ดีครับที่แยก allowed status ออกมาไว้จุดเดียว ทำให้แก้ค่า status ที่อนุญาตได้ง่าย
 
 export function validateEventsQuery(req, res, next) {
   const { page, limit, status } = req.query;
@@ -12,6 +13,7 @@ export function validateEventsQuery(req, res, next) {
     });
   }
 
+  // [Comment] จุดนี้ควรเช็ก parsedLimit <= 0 เพิ่มด้วยครับ เพราะ limit=0 หรือค่าติดลบยังหลุด validation ได้
   if (!Number.isInteger(parsedLimit) || parsedLimit > 10) {
     return res.status(400).json({
       message: 'limit must not be more than 10',

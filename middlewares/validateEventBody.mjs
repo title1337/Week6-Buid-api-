@@ -1,8 +1,10 @@
 const allowedStatuses = ['draft', 'published', 'cancelled'];
+// [Comment] ดีครับที่กำหนด status ที่อนุญาตไว้ชัดเจน ช่วยกันข้อมูลนอก spec เช่น archived เข้าระบบ
 
 export function validateEventBody(req, res, next) {
   const event = req.body;
 
+  // [Comment] ถ้า API document กำหนด response message ไว้เป๊ะ ๆ ควรปรับข้อความ error ให้ตรง spec เพื่อให้ automated test ผ่านง่ายขึ้น
   if (!event.title) {
     return res.status(400).json({
       message: 'กรุณาส่งข้อมูล title เข้ามาด้วย',
@@ -21,6 +23,7 @@ export function validateEventBody(req, res, next) {
     });
   }
 
+  // [Comment] มีการเช็กว่า event_date ถูกส่งมาแล้ว แต่ควรเช็กเพิ่มว่าเป็นวันที่ถูกต้องจริง เช่นไม่ใช่ "abc"
   if (!event.event_date) {
     return res.status(400).json({
       message: 'กรุณาส่งข้อมูล event_date เข้ามาด้วย',

@@ -16,6 +16,7 @@ app.get('/health', (req, res) => {
 });
 
 // TODO: อ่าน API Document แล้วสร้าง routes เองในไฟล์นี้
+// [Comment] ดีครับที่ route list events ใช้ validateEventsQuery แยกการ validate query string ออกจาก logic หลักของ route
 app.get('/events', validateEventsQuery, async (req, res) => {
   const { page, limit, status } = req.eventsQuery;
   const offset = (page - 1) * limit;
@@ -25,6 +26,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
     const dataValues = status ? [status, limit, offset] : [limit, offset];
     const countValues = status ? [status] : [];
 
+    // [Comment] เช็ก API document อีกครั้งว่าหน้า list ต้องคืนแค่ event_id/title หรือควรมี field อื่น เช่น event_date, location, status ด้วย
     const dataQuery = `
       SELECT event_id, title
       FROM events
@@ -40,6 +42,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
       ${whereClause}
     `;
 
+    // [Comment] ดีครับ ตรงนี้ยังใช้ parameterized values อยู่ แม้ query จะมี whereClause แบบ dynamic จึงไม่เอา user input ไปต่อ SQL ตรง ๆ
     const dataResult = await connectionPool.query(dataQuery, dataValues);
     const countResult = await connectionPool.query(countQuery, countValues);
 
@@ -68,6 +71,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
 
 app.get('/events/:eventId', validateEventId, async (req, res) => {
   try {
+    // [Comment] ดีครับ ใช้ req.eventId ที่ผ่าน validateEventId แล้ว และ query ด้วย $1 ช่วยลดความเสี่ยง SQL injection
     const result = await connectionPool.query(
       `
         SELECT *
@@ -101,6 +105,7 @@ app.post('/events', validateEventBody, async (req, res) => {
     req.body;
 
   try {
+    // [Comment] ดีครับ INSERT ใช้ placeholder ครบทุก field และ RETURNING * ทำให้รู้ว่า database สร้าง record สำเร็จจริง
     const result = await connectionPool.query(
       `
         INSERT INTO events (title, description, location, event_date, capacity, status)
@@ -132,6 +137,7 @@ app.put(
       req.body;
 
     try {
+      // [Comment] ดีครับ UPDATE เช็ก result.rows.length เพื่อแยกเคส not found ออกจากเคส update สำเร็จได้ชัดเจน
       const result = await connectionPool.query(
         `
         UPDATE events
@@ -179,6 +185,7 @@ app.put(
 
 app.delete('/events/:eventId', validateEventId, async (req, res) => {
   try {
+    // [Comment] ดีครับ DELETE ใช้ RETURNING * ทำให้ตอบกลับได้ว่า record ที่ลบคืออะไร และรู้ว่า id นี้มีอยู่จริงหรือไม่
     const result = await connectionPool.query(
       `
         DELETE FROM events
@@ -209,6 +216,7 @@ app.delete('/events/:eventId', validateEventId, async (req, res) => {
 
 app.get('/events/:eventId/registrations', validateEventId, async (req, res) => {
   try {
+    // [Comment] ดีครับ bonus endpoint เช็กก่อนว่า event มีอยู่จริง แล้วค่อยดึง registrations ทำให้ 404 ชัดเจนกว่า return array ว่างทันที
     const eventResult = await connectionPool.query(
       `
         SELECT event_id
@@ -249,6 +257,7 @@ app.get('/events/:eventId/registrations', validateEventId, async (req, res) => {
     });
   }
 });
+// [Comment] ก่อนส่งงานจริง แนะนำลบ TODO/Hint ที่เหลือออก เพื่อให้ไฟล์ดูเป็น final submission มากขึ้น
 // Hint 1: route ที่มี id ควรใช้ validateEventId จาก middlewares/validateEventId.mjs
 // Hint 2: route ที่รับ body ควรใช้ validateEventBody จาก middlewares/validateEventBody.mjs
 // Hint 3: pagination ใช้ page, limit, offset = (page - 1) * limit
