@@ -3,6 +3,7 @@ const allowedStatuses = ['draft', 'published', 'cancelled'];
 export function validateEventBody(req, res, next) {
   const event = req.body;
 
+  // [DF Comment] ถ้า API document กำหนดข้อความ response ไว้ ควรเทียบ message ให้ตรง spec อีกครั้ง
   if (!event.title) {
     return res.status(400).json({
       message: 'กรุณาส่งข้อมูล title เข้ามาด้วย',
@@ -21,6 +22,7 @@ export function validateEventBody(req, res, next) {
     });
   }
 
+  // [DF Comment] ตรงนี้ควร validate รูปแบบวันที่เพิ่ม เพราะตอนนี้เช็กแค่ว่าส่ง event_date มาหรือไม่
   if (!event.event_date) {
     return res.status(400).json({
       message: 'กรุณาส่งข้อมูล event_date เข้ามาด้วย',

@@ -25,6 +25,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
     const dataValues = status ? [status, limit, offset] : [limit, offset];
     const countValues = status ? [status] : [];
 
+    // [DF Comment] ตรงนี้ควรเช็ก API document อีกครั้งว่า list events ต้องคืน field ไหนบ้าง ตอนนี้ query คืนแค่ event_id และ title
     const dataQuery = `
       SELECT event_id, title
       FROM events
@@ -40,6 +41,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
       ${whereClause}
     `;
 
+    // [DF Comment] ตรงนี้โอเคแล้วครับ ใช้ parameterized values ไม่เอา user input ไปต่อ SQL ตรง ๆ
     const dataResult = await connectionPool.query(dataQuery, dataValues);
     const countResult = await connectionPool.query(countQuery, countValues);
 
@@ -68,6 +70,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
 
 app.get('/events/:eventId', validateEventId, async (req, res) => {
   try {
+    // [DF Comment] ตรงนี้โอเคแล้วครับ ใช้ req.eventId ที่ผ่าน middleware แล้ว และ query ด้วย $1
     const result = await connectionPool.query(
       `
         SELECT *
@@ -101,6 +104,7 @@ app.post('/events', validateEventBody, async (req, res) => {
     req.body;
 
   try {
+    // [DF Comment] ตรงนี้โอเคแล้วครับ INSERT ใช้ placeholder ครบ และ RETURNING * เพื่อดึง record ที่สร้างกลับมา
     const result = await connectionPool.query(
       `
         INSERT INTO events (title, description, location, event_date, capacity, status)
@@ -132,6 +136,7 @@ app.put(
       req.body;
 
     try {
+      // [DF Comment] ตรงนี้โอเคแล้วครับ UPDATE ใช้ RETURNING * และเช็ก rows.length เพื่อแยกเคส not found
       const result = await connectionPool.query(
         `
         UPDATE events
@@ -179,6 +184,7 @@ app.put(
 
 app.delete('/events/:eventId', validateEventId, async (req, res) => {
   try {
+    // [DF Comment] ตรงนี้โอเคแล้วครับ DELETE ใช้ RETURNING * ทำให้รู้ว่า id นี้มีอยู่จริงก่อนตอบ success
     const result = await connectionPool.query(
       `
         DELETE FROM events
@@ -209,6 +215,7 @@ app.delete('/events/:eventId', validateEventId, async (req, res) => {
 
 app.get('/events/:eventId/registrations', validateEventId, async (req, res) => {
   try {
+    // [DF Comment] ตรงนี้โอเคแล้วครับ bonus endpoint เช็ก event ก่อน แล้วค่อยดึง registrations
     const eventResult = await connectionPool.query(
       `
         SELECT event_id

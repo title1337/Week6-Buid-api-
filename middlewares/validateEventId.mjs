@@ -4,6 +4,7 @@ export function validateEventId(req, res, next) {
   // TODO: ถ้า eventId ไม่ใช่ positive integer ให้ return 400
   // message: "Event id must be a positive number"
   // TODO: ถ้าผ่าน validation ให้เก็บเลขที่แปลงแล้วไว้ที่ req.eventId
+  // [DF Comment] ตรงนี้โอเคแล้วครับ แปลง eventId และ validate positive integer ก่อนนำไปใช้ query
   const { eventId } = req.params;
   const parsedEventId = Number(eventId);
 
