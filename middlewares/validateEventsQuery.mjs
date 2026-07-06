@@ -12,7 +12,7 @@ export function validateEventsQuery(req, res, next) {
     });
   }
 
-  if (!Number.isInteger(parsedLimit) || parsedLimit > 10) {
+  if (!Number.isInteger(parsedLimit <= 0) || parsedLimit > 10) {
     return res.status(400).json({
       message: 'limit must not be more than 10',
     });

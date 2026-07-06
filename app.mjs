@@ -26,7 +26,7 @@ app.get('/events', validateEventsQuery, async (req, res) => {
     const countValues = status ? [status] : [];
 
     const dataQuery = `
-      SELECT event_id, title
+      SELECT event_id, title, description, location, event_date, capacity, status, created_at, updated_at
       FROM events
       ${whereClause}
       ORDER BY event_id

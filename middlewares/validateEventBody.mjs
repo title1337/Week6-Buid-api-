@@ -34,7 +34,7 @@ export function validateEventBody(req, res, next) {
   }
 
   const isPositiveInteger =
-    Number.isInteger(event.capacity) && event.capacity > 0;
+    Number.isInteger(event.capacity) || event.capacity <= 0;
 
   if (!isPositiveInteger) {
     return res.status(400).json({
